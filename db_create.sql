@@ -5,7 +5,7 @@
 -- Dumped from database version 10.10
 -- Dumped by pg_dump version 10.10
 
--- Started on 2019-09-01 19:09:33
+-- Started on 2019-09-04 06:34:11
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,8 +19,8 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- TOC entry 2818 (class 0 OID 0)
--- Dependencies: 2817
+-- TOC entry 2823 (class 0 OID 0)
+-- Dependencies: 2822
 -- Name: DATABASE katastar_db; Type: COMMENT; Schema: -; Owner: -
 --
 
@@ -36,7 +36,7 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 2820 (class 0 OID 0)
+-- TOC entry 2825 (class 0 OID 0)
 -- Dependencies: 1
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
@@ -79,7 +79,7 @@ CREATE TABLE public.nekretnine (
 
 
 --
--- TOC entry 2821 (class 0 OID 0)
+-- TOC entry 2826 (class 0 OID 0)
 -- Dependencies: 196
 -- Name: COLUMN nekretnine.garaze; Type: COMMENT; Schema: public; Owner: -
 --
@@ -99,7 +99,36 @@ CREATE TABLE public.opstine (
 
 
 --
--- TOC entry 2688 (class 2606 OID 16427)
+-- TOC entry 199 (class 1259 OID 16444)
+-- Name: v_nekretnine; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.v_nekretnine AS
+ SELECT n.datum,
+    n.cena,
+    n.kvadratura,
+    n.cenam2 AS "cena po kvadratu",
+    n.garaze AS "broj garaza",
+    o.ime AS opstina,
+    k.ime AS "katastarska opstina",
+    n.lat AS latitude,
+    n.lon AS longitude
+   FROM ((public.nekretnine n
+     JOIN public.katastri k ON ((n.katastar_id = k.id)))
+     JOIN public.opstine o ON ((k.opstina_id = o.id)));
+
+
+--
+-- TOC entry 2827 (class 0 OID 0)
+-- Dependencies: 199
+-- Name: VIEW v_nekretnine; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON VIEW public.v_nekretnine IS 'view koji objedinjuje sve tri glavne tabele';
+
+
+--
+-- TOC entry 2692 (class 2606 OID 16427)
 -- Name: katastri katastar_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -108,7 +137,7 @@ ALTER TABLE ONLY public.katastri
 
 
 --
--- TOC entry 2683 (class 2606 OID 16401)
+-- TOC entry 2687 (class 2606 OID 16401)
 -- Name: nekretnine nekretnina_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -117,7 +146,7 @@ ALTER TABLE ONLY public.nekretnine
 
 
 --
--- TOC entry 2685 (class 2606 OID 16419)
+-- TOC entry 2689 (class 2606 OID 16419)
 -- Name: opstine opstina_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -126,7 +155,7 @@ ALTER TABLE ONLY public.opstine
 
 
 --
--- TOC entry 2680 (class 1259 OID 16439)
+-- TOC entry 2684 (class 1259 OID 16439)
 -- Name: fki_katastar_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -134,7 +163,7 @@ CREATE INDEX fki_katastar_id ON public.nekretnine USING btree (katastar_id);
 
 
 --
--- TOC entry 2686 (class 1259 OID 16433)
+-- TOC entry 2690 (class 1259 OID 16433)
 -- Name: fki_opstina_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -142,7 +171,7 @@ CREATE INDEX fki_opstina_id ON public.katastri USING btree (opstina_id);
 
 
 --
--- TOC entry 2681 (class 1259 OID 16402)
+-- TOC entry 2685 (class 1259 OID 16402)
 -- Name: index_cenam2; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -150,7 +179,7 @@ CREATE INDEX index_cenam2 ON public.nekretnine USING btree (cenam2 DESC NULLS LA
 
 
 --
--- TOC entry 2689 (class 2606 OID 16434)
+-- TOC entry 2693 (class 2606 OID 16434)
 -- Name: nekretnine katastar_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -159,7 +188,7 @@ ALTER TABLE ONLY public.nekretnine
 
 
 --
--- TOC entry 2690 (class 2606 OID 16428)
+-- TOC entry 2694 (class 2606 OID 16428)
 -- Name: katastri opstina_id; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -167,7 +196,7 @@ ALTER TABLE ONLY public.katastri
     ADD CONSTRAINT opstina_id FOREIGN KEY (opstina_id) REFERENCES public.opstine(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
--- Completed on 2019-09-01 19:09:33
+-- Completed on 2019-09-04 06:34:13
 
 --
 -- PostgreSQL database dump complete

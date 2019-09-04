@@ -255,7 +255,8 @@ if __name__ == "__main__":
                                 sdate = sdate + datetime.timedelta(days=days)
                                 days = (edate - sdate).days + 1
                         except Exception as error:
-                            print("Exception occurred during processing of date: {}".format(current_date), error)
+                            print("An exception occurred during processing of date: {} and next {} days.".format(current_date.date(), days), error)
+                            print("In order to retrieve the data on these dates, you can rerun the script with the following parameters: -s {} -e {}".format(sdate.strftime("%d.%m.%y"), (sdate + datetime.timedelta(days=days-1)).strftime("%d.%m.%y")))
 
             for contract in contracts:
                 cursor.execute("execute nekretnine_statement (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (contract['id'], contract['date'], contract['price'], contract['area'], contract['pricem2'], contract['lat'], contract['lon'], contract['garagecount'], contract['id_katastar']))
