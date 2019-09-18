@@ -177,7 +177,6 @@ def extract_contracts(response, id_katastar):
         }
         if is_invalid_contract(contract):
             continue
-        contract['pricem2'] = round(contract['price'] / contract['area'], 2)
         contract['garagecount'] = extract_garage_count(data)
         contract['lat'] = apartment['latlon']['Lat']
         contract['lon'] = apartment['latlon']['Lon']
@@ -227,7 +226,7 @@ if __name__ == "__main__":
                                       database="katastar_db")
         cursor = connection.cursor()
         cursor.execute("prepare adrese_statement as insert into adrese (lat, lon, skenirano) values ($1,$2,$3) on conflict do nothing")
-        cursor.execute("prepare nekretnine_statement as insert into nekretnine (id, datum, cena, kvadratura, cenam2, lat, lon, garaze, katastar_id) values ($1,$2,$3,$4,$5,$6,$7,$8,$9) on conflict do nothing")
+        cursor.execute("prepare nekretnine_statement as insert into nekretnine (id, datum, cena, kvadratura, lat, lon, garaze, katastar_id) values ($1,$2,$3,$4,$5,$6,$7,$8) on conflict do nothing")
 
         current_date = start_date
         while current_date <= end_date:
@@ -261,7 +260,7 @@ if __name__ == "__main__":
 
             for contract in contracts:
                 cursor.execute("execute adrese_statement (%s, %s, %s)", (contract['lat'], contract['lon'], False))
-                cursor.execute("execute nekretnine_statement (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (contract['id'], contract['date'], contract['price'], contract['area'], contract['pricem2'], contract['lat'], contract['lon'], contract['garagecount'], contract['id_katastar']))
+                cursor.execute("execute nekretnine_statement (%s, %s, %s, %s, %s, %s, %s, %s)", (contract['id'], contract['date'], contract['price'], contract['area'], contract['lat'], contract['lon'], contract['garagecount'], contract['id_katastar']))
             connection.commit()
             current_date = current_date + datetime.timedelta(days=days_per_req)
     except psycopg2.Error as error:
