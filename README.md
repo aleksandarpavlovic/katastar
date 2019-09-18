@@ -9,7 +9,7 @@ Inicijalno skripta podržava samo Beograd.
 Potrebno je instalirati Postgresql bazu i pgAdmin 4 tool. [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
 A morate imati i python 3. [https://www.python.org/downloads/](https://www.python.org/downloads/)
 
-Kreiranje baze je najjednostavnije odraditi kroz pgAdmin gui, importovanjem baze iz **db_create.custom** ili **db_create.sql** fajla.
+Kreiranje baze je najjednostavnije odraditi kroz pgAdmin gui, importovanjem baze iz **db_create.backup** ili **db_create.sql** fajla.
 
 Pokrenite skriptu **opstine.py** kako bi inicijalizovali bazu podacima o opštinama i katastrima.
 ### Ovo radite periodično, s vremena na vreme, kad vam se ćefne...
