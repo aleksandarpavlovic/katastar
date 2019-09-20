@@ -12,7 +12,7 @@ PARAMS = {
     'addressdetails': '1'
 }
 HEADERS = {
-    'UserAgent': "Katastar/1.0 (pretraga.stanova@gmail.com)"
+    'User-Agent': "Katastar/1.0 (pretraga.stanova@gmail.com)"
 }
 TIMEOUT = 5
 
