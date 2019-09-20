@@ -11,12 +11,15 @@ PARAMS = {
     'zoom': '18',
     'addressdetails': '1'
 }
+HEADERS = {
+    'User-Agent': "Katastar/1.0 (pretrage.stanova@gmail.com)"
+}
 
 
 def obtain_address(lat, lon):
     PARAMS['lat'] = lat
     PARAMS['lon'] = lon
-    resp = requests.get(url=URL, params=PARAMS)
+    resp = requests.get(url=URL, params=PARAMS, headers=HEADERS)
     data = resp.json()
     address = {
         'lat': lat,
