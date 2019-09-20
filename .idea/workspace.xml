@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="fed67b95-1271-4b45-9851-7bbc509e3f59" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/adrese.py" beforeDir="false" afterPath="$PROJECT_DIR$/adrese.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -82,7 +83,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
-      <option name="PARAMETERS" value="-s 04.07.2019 -e 07.07.2019" />
+      <option name="PARAMETERS" value="-s 04.06.2018 -e 07.06.2018" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -163,7 +164,14 @@
       <option name="project" value="LOCAL" />
       <updated>1568833406201</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="removing redundant column">
+      <created>1568836849124</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1568836849124</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -183,7 +191,8 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="created view on realties" />
     <MESSAGE value="extracting addresses from open street map public api" />
-    <option name="LAST_COMMIT_MESSAGE" value="extracting addresses from open street map public api" />
+    <MESSAGE value="removing redundant column" />
+    <option name="LAST_COMMIT_MESSAGE" value="removing redundant column" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

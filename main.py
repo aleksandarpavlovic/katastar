@@ -4,6 +4,7 @@ import json
 import datetime
 import sys
 import getopt
+import time
 
 # constants
 APARTMENT = 831
@@ -107,6 +108,39 @@ opstine = {
     }
 }
 
+URL = "http://katastar.rgz.gov.rs/RegistarCenaNepokretnosti/Default.aspx/Data"
+HEADERS = {
+    'Content-type': "application/json",
+    'Host': "katastar.rgz.gov.rs",
+    'Origin': "http://katastar.rgz.gov.rs",
+    'Referer': "http://katastar.rgz.gov.rs/RegistarCenaNepokretnosti/"
+}
+BODY = {
+    'DatumPocetak': 'TO BE POPULATED',
+    'DatumZavrsetak': 'TO BE POPULATED',
+    'OpstinaID': 'TO BE POPULATED',  # opstina
+    'KoID': 'TO BE POPULATED',  # katastarska opstina
+    'VrsteNepokretnosti': str(APARTMENT)  # stan
+}
+TIMEOUT = 5
+
+
+def post_timeout(url, headers, body, timeout=TIMEOUT):
+    try:
+        return requests.post(url=url, headers=headers, data=body, timeout=timeout)
+    except Exception:
+        return None
+
+
+def post_retry(url, headers, body, retry_count=2):
+    response = post_timeout(url=url, headers=headers, body=body)
+    count = 0
+    while not response and count < retry_count:
+        time.sleep(1)
+        count += 1
+        response = post_timeout(url=url, headers=headers, body=body)
+    return response
+
 
 def is_invalid_contract(contract):
     return contract['id'] is None \
@@ -204,20 +238,6 @@ if __name__ == "__main__":
             end_date = datetime.datetime.strptime(arg, '%d.%m.%Y')
     validate_dates(start_date, end_date)
 
-    url = "http://katastar.rgz.gov.rs/RegistarCenaNepokretnosti/Default.aspx/Data"
-    headers = {
-        'Content-type': "application/json",
-        'Host': "katastar.rgz.gov.rs",
-        'Origin': "http://katastar.rgz.gov.rs",
-        'Referer': "http://katastar.rgz.gov.rs/RegistarCenaNepokretnosti/"
-    }
-    body = {
-        'DatumPocetak': 'TO BE POPULATED',
-        'DatumZavrsetak': 'TO BE POPULATED',
-        'OpstinaID': 'TO BE POPULATED',  # opstina
-        'KoID': 'TO BE POPULATED',  # katastarska opstina
-        'VrsteNepokretnosti': str(APARTMENT)  # stan
-    }
     try:
         connection = psycopg2.connect(user="postgres",
                                       password="postgres",
@@ -240,23 +260,27 @@ if __name__ == "__main__":
                     sdate = current_date
                     edate = current_date + datetime.timedelta(days=days-1)
                     while sdate <= edate and days >= 1:
-                        body['DatumPocetak'] = sdate.strftime("%d.%m.%y")
-                        body['DatumZavrsetak'] = (sdate + datetime.timedelta(days=days-1)).strftime("%d.%m.%y")
-                        body['OpstinaID'] = id_opstina
-                        body['KoID'] = id_katastar
+                        BODY['DatumPocetak'] = sdate.strftime("%d.%m.%y")
+                        BODY['DatumZavrsetak'] = (sdate + datetime.timedelta(days=days-1)).strftime("%d.%m.%y")
+                        BODY['OpstinaID'] = id_opstina
+                        BODY['KoID'] = id_katastar
                         try:
-                            response = requests.post(url=url, data=json.dumps(body), headers=headers)
-                            response_dict = parse_response(response)
-                            if is_response_max_size_exceeded(response_dict) and days > 1:
-                                print("Response for {} consecutive days returned maximum of {} contracts which means some contracts might be missing. Attempting with {} consecutive days...".format(days, MAX_RESPONSE_SIZE, days // 2))
-                                days = days // 2
+                            response = post_retry(url=URL, headers=HEADERS, body=json.dumps(BODY))
+                            if response:
+                                response_dict = parse_response(response)
+                                if is_response_max_size_exceeded(response_dict) and days > 1:
+                                    print("Response for {} consecutive days returned maximum of {} contracts which means some contracts might be missing. Attempting with {} consecutive days...".format(days, MAX_RESPONSE_SIZE, days // 2))
+                                    days = days // 2
+                                else:
+                                    contracts.extend(extract_contracts(response_dict, id_katastar))
+                                    sdate = sdate + datetime.timedelta(days=days)
+                                    days = (edate - sdate).days + 1
                             else:
-                                contracts.extend(extract_contracts(response_dict, id_katastar))
-                                sdate = sdate + datetime.timedelta(days=days)
-                                days = (edate - sdate).days + 1
+                                raise Exception
                         except Exception as error:
                             print("An exception occurred during processing of date: {} and next {} days.".format(current_date.date(), days), error)
                             print("In order to retrieve the data on these dates, you can rerun the script with the following parameters: -s {} -e {}".format(sdate.strftime("%d.%m.%y"), (sdate + datetime.timedelta(days=days-1)).strftime("%d.%m.%y")))
+                            break
 
             for contract in contracts:
                 cursor.execute("execute adrese_statement (%s, %s, %s)", (contract['lat'], contract['lon'], False))
