@@ -108,9 +108,10 @@ opstine = {
     }
 }
 
-URL = "http://katastar.rgz.gov.rs/RegistarCenaNepokretnosti/Default.aspx/Data"
+URL = "https://katastar.rgz.gov.rs/RegistarCenaNepokretnosti/Default.aspx/Data"
+INITIAL_URL = "https://katastar.rgz.gov.rs/RegistarCenaNepokretnosti/"
 HEADERS = {
-    'Content-type': "application/json",
+    'Content-Type': "application/json",
     'Host': "katastar.rgz.gov.rs",
     'Origin': "http://katastar.rgz.gov.rs",
     'Referer': "http://katastar.rgz.gov.rs/RegistarCenaNepokretnosti/"
@@ -125,20 +126,20 @@ BODY = {
 TIMEOUT = 5
 
 
-def post_timeout(url, headers, body, timeout=TIMEOUT):
+def post_timeout(session, url, headers, body, timeout=TIMEOUT):
     try:
-        return requests.post(url=url, headers=headers, data=body, timeout=timeout)
+        return session.post(url=url, headers=headers, data=body, timeout=timeout)
     except Exception:
         return None
 
 
-def post_retry(url, headers, body, retry_count=2):
-    response = post_timeout(url=url, headers=headers, body=body)
+def post_retry(session, url, headers, body, retry_count=2):
+    response = post_timeout(session=session, url=url, headers=headers, body=body)
     count = 0
     while not response and count < retry_count:
         time.sleep(1)
         count += 1
-        response = post_timeout(url=url, headers=headers, body=body)
+        response = post_timeout(session=session, url=url, headers=headers, body=body)
     return response
 
 
@@ -248,6 +249,8 @@ if __name__ == "__main__":
         cursor.execute("prepare adrese_statement as insert into adrese (lat, lon, skenirano) values ($1,$2,$3) on conflict do nothing")
         cursor.execute("prepare nekretnine_statement as insert into nekretnine (id, datum, cena, kvadratura, lat, lon, garaze, katastar_id) values ($1,$2,$3,$4,$5,$6,$7,$8) on conflict do nothing")
 
+        session = requests.session()
+        session.get(INITIAL_URL)
         current_date = start_date
         while current_date <= end_date:
             days_per_req = min(DAYS_PER_REQUEST, (end_date-current_date).days+1)
@@ -265,7 +268,7 @@ if __name__ == "__main__":
                         BODY['OpstinaID'] = id_opstina
                         BODY['KoID'] = id_katastar
                         try:
-                            response = post_retry(url=URL, headers=HEADERS, body=json.dumps(BODY))
+                            response = post_retry(session=session, url=URL, headers=HEADERS, body=json.dumps(BODY))
                             if response:
                                 response_dict = parse_response(response)
                                 if is_response_max_size_exceeded(response_dict) and days > 1:
